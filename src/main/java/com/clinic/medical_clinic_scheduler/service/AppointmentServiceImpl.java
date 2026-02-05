@@ -1,6 +1,7 @@
 package com.clinic.medical_clinic_scheduler.service;
 
 import com.clinic.medical_clinic_scheduler.dto.AppointmentDTO;
+import com.clinic.medical_clinic_scheduler.dto.BookAppointmentDTO;
 import com.clinic.medical_clinic_scheduler.dto.ScheduleRequestDTO;
 import com.clinic.medical_clinic_scheduler.mapper.AppointmentMapper;
 import com.clinic.medical_clinic_scheduler.model.Appointment;
@@ -8,6 +9,7 @@ import com.clinic.medical_clinic_scheduler.model.AppointmentStatus;
 import com.clinic.medical_clinic_scheduler.model.Doctor;
 import com.clinic.medical_clinic_scheduler.repository.AppointmentRepository;
 import com.clinic.medical_clinic_scheduler.repository.DoctorRepository;
+import com.clinic.medical_clinic_scheduler.repository.PatientRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,6 +26,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
     private final DoctorRepository doctorRepository;
+    private final PatientRepository patientRepository;
     private final AppointmentMapper appointmentMapper;
 
     @Override
@@ -59,5 +62,27 @@ public class AppointmentServiceImpl implements AppointmentService {
         return savedAppointments.stream()
                 .map(appointmentMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public AppointmentDTO bookAppointment(Long appointmentId, BookAppointmentDTO bookAppointmentDTO) {
+
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Appointment with ID " + appointmentId + " not found"));
+
+        if (appointment.getStatus() != AppointmentStatus.AVAILABLE) {
+            throw new IllegalStateException("Appointment is already booked or cancelled");
+        }
+
+        com.clinic.medical_clinic_scheduler.model.Patient patient = patientRepository.findById(bookAppointmentDTO.getPatientId())
+                .orElseThrow(() -> new EntityNotFoundException("Patient with ID " + bookAppointmentDTO.getPatientId() + " not found"));
+
+        appointment.setPatient(patient);
+        appointment.setStatus(AppointmentStatus.BOOKED);
+
+        Appointment updatedAppointment = appointmentRepository.save(appointment);
+
+        return appointmentMapper.toDTO(updatedAppointment);
     }
 }

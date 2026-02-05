@@ -7,10 +7,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -25,5 +22,14 @@ public class AppointmentController {
     public ResponseEntity<List<AppointmentDTO>> createSchedule(@Valid @RequestBody ScheduleRequestDTO scheduleRequestDTO) {
         List<AppointmentDTO> createdAppointments = appointmentService.createSchedule(scheduleRequestDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdAppointments);
+    }
+
+    @PatchMapping("/{id}/book")
+    public ResponseEntity<AppointmentDTO> bookAppointment(
+            @PathVariable Long id,
+            @Valid @RequestBody com.clinic.medical_clinic_scheduler.dto.BookAppointmentDTO bookAppointmentDTO) {
+
+        AppointmentDTO bookedAppointment = appointmentService.bookAppointment(id, bookAppointmentDTO);
+        return ResponseEntity.ok(bookedAppointment);
     }
 }
