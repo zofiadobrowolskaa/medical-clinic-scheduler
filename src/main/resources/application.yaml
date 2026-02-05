@@ -1,3 +1,16 @@
 spring:
-  application:
-    name: medical-clinic-scheduler
+  datasource:
+    url: jdbc:postgresql://localhost:5432/medical_clinic
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    database: postgresql
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
