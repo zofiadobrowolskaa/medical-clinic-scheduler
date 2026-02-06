@@ -10,6 +10,7 @@ import com.clinic.medical_clinic_scheduler.repository.AppointmentRepository;
 import com.clinic.medical_clinic_scheduler.repository.PatientRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ public class PatientServiceImpl implements PatientService {
     private final PatientRepository patientRepository;
     private final PatientMapper patientMapper;
     private final AppointmentRepository appointmentRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -33,6 +35,9 @@ public class PatientServiceImpl implements PatientService {
         }
 
         Patient patient = patientMapper.toEntity(patientCreateDTO);
+
+        patient.setPassword(passwordEncoder.encode(patientCreateDTO.getPassword()));
+        patient.setRole("PATIENT");
 
         Patient savedPatient = patientRepository.save(patient);
 
