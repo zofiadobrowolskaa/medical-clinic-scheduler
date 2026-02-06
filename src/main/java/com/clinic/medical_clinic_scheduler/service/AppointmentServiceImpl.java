@@ -15,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,6 +73,10 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new EntityNotFoundException("Appointment with ID " + appointmentId + " not found"));
 
+        if (appointment.getStartTime().isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("Cannot book an appointment in the past");
+        }
+
         if (appointment.getStatus() != AppointmentStatus.AVAILABLE) {
             throw new IllegalStateException("Appointment is already booked or cancelled");
         }
@@ -84,5 +90,51 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment updatedAppointment = appointmentRepository.save(appointment);
 
         return appointmentMapper.toDTO(updatedAppointment);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AppointmentDTO> getAvailableSlots(Long doctorId, String date) {
+        LocalDate searchDate = LocalDate.parse(date);
+        LocalDateTime startOfDay = searchDate.atStartOfDay();
+        LocalDateTime endOfDay = searchDate.atTime(LocalTime.MAX);
+
+        List<Appointment> appointments = appointmentRepository.findAllByDoctorIdAndStartTimeBetween(doctorId, startOfDay, endOfDay);
+
+        return appointments.stream()
+                .filter(a -> a.getStatus() == AppointmentStatus.AVAILABLE)
+                .filter(a -> a.getStartTime().isAfter(LocalDateTime.now()))
+                .map(appointmentMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AppointmentDTO> getPatientAppointments(Long patientId) {
+        return appointmentRepository.findAllByPatientId(patientId)
+                .stream()
+                .map(appointmentMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public AppointmentDTO cancelAppointment(Long appointmentId) {
+
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Appointment with ID " + appointmentId + " not found"));
+
+        if (appointment.getStatus() != AppointmentStatus.BOOKED) {
+            throw new IllegalStateException("Only booked appointments can be cancelled");
+        }
+
+        if (appointment.getStartTime().isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("Cannot cancel an appointment that has already taken place");
+        }
+
+        appointment.setPatient(null);
+        appointment.setStatus(AppointmentStatus.AVAILABLE);
+
+        return appointmentMapper.toDTO(appointmentRepository.save(appointment));
     }
 }
