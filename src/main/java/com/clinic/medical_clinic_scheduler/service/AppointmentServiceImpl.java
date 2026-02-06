@@ -103,6 +103,7 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         return appointments.stream()
                 .filter(a -> a.getStatus() == AppointmentStatus.AVAILABLE)
+                .filter(a -> a.getStartTime().isAfter(LocalDateTime.now()))
                 .map(appointmentMapper::toDTO)
                 .collect(Collectors.toList());
     }

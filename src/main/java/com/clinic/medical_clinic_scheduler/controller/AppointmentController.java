@@ -32,4 +32,16 @@ public class AppointmentController {
         AppointmentDTO bookedAppointment = appointmentService.bookAppointment(id, bookAppointmentDTO);
         return ResponseEntity.ok(bookedAppointment);
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<AppointmentDTO>> getAvailableAppointments(
+            @RequestParam Long doctorId,
+            @RequestParam String date) {
+        return ResponseEntity.ok(appointmentService.getAvailableSlots(doctorId, date));
+    }
+
+    @GetMapping("/patient/{patientId}")
+    public ResponseEntity<List<AppointmentDTO>> getPatientAppointments(@PathVariable Long patientId) {
+        return ResponseEntity.ok(appointmentService.getPatientAppointments(patientId));
+    }
 }
