@@ -35,7 +35,7 @@ public class DoctorServiceImpl implements DoctorService {
 
         Doctor doctor = doctorMapper.toEntity(doctorCreateDTO);
 
-        doctor.setPassword(passwordEncoder.encode("doctor123"));
+        doctor.setPassword(passwordEncoder.encode(doctorCreateDTO.getPassword()));
         doctor.setRole("DOCTOR");
 
         Doctor savedDoctor = doctorRepository.save(doctor);
