@@ -71,6 +71,10 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new EntityNotFoundException("Appointment with ID " + appointmentId + " not found"));
 
+        if (appointment.getStartTime().isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("Cannot book an appointment in the past");
+        }
+
         if (appointment.getStatus() != AppointmentStatus.AVAILABLE) {
             throw new IllegalStateException("Appointment is already booked or cancelled");
         }
