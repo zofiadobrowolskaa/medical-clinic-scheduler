@@ -8,4 +8,6 @@ import java.util.List;
 public interface PatientService {
     PatientDTO createPatient(PatientCreateDTO patientCreateDTO);
     List<PatientDTO> getAllPatients();
+
+    void deletePatient(Long id);
 }

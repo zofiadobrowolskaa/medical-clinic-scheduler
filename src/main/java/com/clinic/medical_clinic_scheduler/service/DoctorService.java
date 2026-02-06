@@ -7,4 +7,5 @@ import java.util.List;
 public interface DoctorService {
     DoctorDTO createDoctor(DoctorCreateDTO doctorCreateDTO);
     List<DoctorDTO> getAllDoctors();
+    void deleteDoctor(Long id);
 }

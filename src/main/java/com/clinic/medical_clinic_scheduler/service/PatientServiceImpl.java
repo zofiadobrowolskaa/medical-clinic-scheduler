@@ -4,8 +4,11 @@ import com.clinic.medical_clinic_scheduler.dto.PatientCreateDTO;
 import com.clinic.medical_clinic_scheduler.dto.PatientDTO;
 import com.clinic.medical_clinic_scheduler.exception.PatientAlreadyExistsException;
 import com.clinic.medical_clinic_scheduler.mapper.PatientMapper;
+import com.clinic.medical_clinic_scheduler.model.Appointment;
 import com.clinic.medical_clinic_scheduler.model.Patient;
+import com.clinic.medical_clinic_scheduler.repository.AppointmentRepository;
 import com.clinic.medical_clinic_scheduler.repository.PatientRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +22,7 @@ public class PatientServiceImpl implements PatientService {
 
     private final PatientRepository patientRepository;
     private final PatientMapper patientMapper;
+    private final AppointmentRepository appointmentRepository;
 
     @Override
     @Transactional
@@ -42,5 +46,20 @@ public class PatientServiceImpl implements PatientService {
                 .stream()
                 .map(patientMapper::toDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void deletePatient(Long id) {
+        if (!patientRepository.existsById(id)) {
+            throw new EntityNotFoundException("Patient with ID " + id + " not found");
+        }
+
+        List<Appointment> appointments = appointmentRepository.findAllByPatientId(id);
+        if (!appointments.isEmpty()) {
+            throw new IllegalStateException("Cannot delete patient who has scheduled or past appointments.");
+        }
+
+        patientRepository.deleteById(id);
     }
 }
