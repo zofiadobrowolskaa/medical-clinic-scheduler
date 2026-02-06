@@ -34,4 +34,8 @@ public class Appointment {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "patient_id")
     private Patient patient;
+
+    @Version
+    @Column(nullable = false)
+    private Long version;
 }
