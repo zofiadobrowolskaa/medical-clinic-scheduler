@@ -15,7 +15,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -88,5 +90,29 @@ public class AppointmentServiceImpl implements AppointmentService {
         Appointment updatedAppointment = appointmentRepository.save(appointment);
 
         return appointmentMapper.toDTO(updatedAppointment);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AppointmentDTO> getAvailableSlots(Long doctorId, String date) {
+        LocalDate searchDate = LocalDate.parse(date);
+        LocalDateTime startOfDay = searchDate.atStartOfDay();
+        LocalDateTime endOfDay = searchDate.atTime(LocalTime.MAX);
+
+        List<Appointment> appointments = appointmentRepository.findAllByDoctorIdAndStartTimeBetween(doctorId, startOfDay, endOfDay);
+
+        return appointments.stream()
+                .filter(a -> a.getStatus() == AppointmentStatus.AVAILABLE)
+                .map(appointmentMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<AppointmentDTO> getPatientAppointments(Long patientId) {
+        return appointmentRepository.findAllByPatientId(patientId)
+                .stream()
+                .map(appointmentMapper::toDTO)
+                .collect(Collectors.toList());
     }
 }

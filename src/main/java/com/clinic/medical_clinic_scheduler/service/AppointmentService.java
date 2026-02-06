@@ -10,4 +10,7 @@ public interface AppointmentService {
     List<AppointmentDTO> createSchedule(ScheduleRequestDTO scheduleRequestDTO);
 
     AppointmentDTO bookAppointment(Long appointmentId, BookAppointmentDTO bookAppointmentDTO);
+
+    List<AppointmentDTO> getAvailableSlots(Long doctorId, String date);
+    List<AppointmentDTO> getPatientAppointments(Long patientId);
 }
