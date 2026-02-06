@@ -2,6 +2,7 @@ package com.clinic.medical_clinic_scheduler.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -29,5 +30,6 @@ public class PatientCreateDTO {
     private String lastName;
 
     @NotBlank(message = "Phone number is required")
+    @Pattern(regexp = "^\\d{9}$", message = "Phone number must be exactly 9 digits") // Np. format polski
     private String phoneNumber;
 }
