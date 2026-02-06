@@ -44,4 +44,10 @@ public class AppointmentController {
     public ResponseEntity<List<AppointmentDTO>> getPatientAppointments(@PathVariable Long patientId) {
         return ResponseEntity.ok(appointmentService.getPatientAppointments(patientId));
     }
+
+    @PatchMapping("/{id}/cancel")
+    public ResponseEntity<AppointmentDTO> cancelAppointment(@PathVariable Long id) {
+        AppointmentDTO cancelledAppointment = appointmentService.cancelAppointment(id);
+        return ResponseEntity.ok(cancelledAppointment);
+    }
 }

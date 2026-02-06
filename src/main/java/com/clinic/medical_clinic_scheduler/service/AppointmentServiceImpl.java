@@ -116,4 +116,25 @@ public class AppointmentServiceImpl implements AppointmentService {
                 .map(appointmentMapper::toDTO)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    @Transactional
+    public AppointmentDTO cancelAppointment(Long appointmentId) {
+
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Appointment with ID " + appointmentId + " not found"));
+
+        if (appointment.getStatus() != AppointmentStatus.BOOKED) {
+            throw new IllegalStateException("Only booked appointments can be cancelled");
+        }
+
+        if (appointment.getStartTime().isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("Cannot cancel an appointment that has already taken place");
+        }
+
+        appointment.setPatient(null);
+        appointment.setStatus(AppointmentStatus.AVAILABLE);
+
+        return appointmentMapper.toDTO(appointmentRepository.save(appointment));
+    }
 }

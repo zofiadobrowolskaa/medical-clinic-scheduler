@@ -13,4 +13,6 @@ public interface AppointmentService {
 
     List<AppointmentDTO> getAvailableSlots(Long doctorId, String date);
     List<AppointmentDTO> getPatientAppointments(Long patientId);
+
+    AppointmentDTO cancelAppointment(Long appointmentId);
 }
