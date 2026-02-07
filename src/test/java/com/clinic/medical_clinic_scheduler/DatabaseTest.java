@@ -2,6 +2,7 @@ package com.clinic.medical_clinic_scheduler;
 
 import com.clinic.medical_clinic_scheduler.model.Patient;
 import com.clinic.medical_clinic_scheduler.repository.PatientRepository;
+import com.clinic.medical_clinic_scheduler.model.Role;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,7 +28,7 @@ class DatabaseTest {
                 .firstName("John")
                 .lastName("Doe")
                 .phoneNumber("123456789")
-                .role("PATIENT")
+                .role(Role.PATIENT)
                 .build();
 
         // when

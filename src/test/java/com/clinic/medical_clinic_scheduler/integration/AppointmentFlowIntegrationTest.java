@@ -3,6 +3,7 @@ package com.clinic.medical_clinic_scheduler.integration;
 import com.clinic.medical_clinic_scheduler.dto.ScheduleRequestDTO;
 import com.clinic.medical_clinic_scheduler.model.Appointment;
 import com.clinic.medical_clinic_scheduler.model.Doctor;
+import com.clinic.medical_clinic_scheduler.model.Role;
 import com.clinic.medical_clinic_scheduler.repository.AppointmentRepository;
 import com.clinic.medical_clinic_scheduler.repository.DoctorRepository;
 import com.clinic.medical_clinic_scheduler.repository.PatientRepository;
@@ -44,7 +45,7 @@ class AppointmentFlowIntegrationTest {
                 .email("doc@test.com")
                 .specialization("Cardiology")
                 .password("pass")
-                .role("DOCTOR")
+                .role(Role.DOCTOR)
                 .build();
         Doctor savedDoctor = doctorRepository.save(doctor);
 
@@ -74,17 +75,17 @@ class AppointmentFlowIntegrationTest {
         // 1. setup data
         Doctor doctor = doctorRepository.save(Doctor.builder()
                 .firstName("House").lastName("MD").email("house@md.com")
-                .specialization("I").password("pass").role("DOCTOR").build());
+                .specialization("I").password("pass").role(Role.DOCTOR).build());
 
         com.clinic.medical_clinic_scheduler.model.Patient p1 = patientRepository.save(
                 com.clinic.medical_clinic_scheduler.model.Patient.builder()
                         .firstName("P1").lastName("X").email("p1@test.com")
-                        .password("pass").phoneNumber("111").role("PATIENT").build());
+                        .password("pass").phoneNumber("111").role(Role.PATIENT).build());
 
         com.clinic.medical_clinic_scheduler.model.Patient p2 = patientRepository.save(
                 com.clinic.medical_clinic_scheduler.model.Patient.builder()
                         .firstName("P2").lastName("Y").email("p2@test.com")
-                        .password("pass").phoneNumber("222").role("PATIENT").build());
+                        .password("pass").phoneNumber("222").role(Role.PATIENT).build());
 
         Appointment appointment = appointmentRepository.save(Appointment.builder()
                 .doctor(doctor)

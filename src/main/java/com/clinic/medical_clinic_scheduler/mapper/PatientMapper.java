@@ -12,5 +12,6 @@ public interface PatientMapper {
     PatientDTO toDTO(Patient patient);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "role", ignore = true)
     Patient toEntity(PatientCreateDTO patientCreateDTO);
 }
