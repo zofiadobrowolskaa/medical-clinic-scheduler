@@ -13,5 +13,6 @@ public interface PatientMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
     Patient toEntity(PatientCreateDTO patientCreateDTO);
 }

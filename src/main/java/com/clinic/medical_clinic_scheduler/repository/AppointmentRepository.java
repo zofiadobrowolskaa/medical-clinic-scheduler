@@ -16,6 +16,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
 
     List<Appointment> findAllByPatientId(Long patientId);
 
+    boolean existsByDoctorId(Long doctorId);
+
     @Query("SELECT COUNT(a) > 0 FROM Appointment a " +
             "WHERE a.doctor.id = :doctorId " +
             "AND a.startTime < :endTime " +

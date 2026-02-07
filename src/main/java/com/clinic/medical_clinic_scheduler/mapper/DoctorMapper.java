@@ -14,5 +14,6 @@ public interface DoctorMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "appointments", ignore = true)
     @Mapping(target = "role", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
     Doctor toEntity(DoctorCreateDTO doctorCreateDTO);
 }
