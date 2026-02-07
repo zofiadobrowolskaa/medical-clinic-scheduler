@@ -3,6 +3,9 @@ package com.clinic.medical_clinic_scheduler.service;
 import com.clinic.medical_clinic_scheduler.dto.AppointmentDTO;
 import com.clinic.medical_clinic_scheduler.dto.BookAppointmentDTO;
 import com.clinic.medical_clinic_scheduler.dto.ScheduleRequestDTO;
+import com.clinic.medical_clinic_scheduler.exception.ActionNotAllowedException;
+import com.clinic.medical_clinic_scheduler.exception.AppointmentConflictException;
+import com.clinic.medical_clinic_scheduler.exception.ResourceNotFoundException;
 import com.clinic.medical_clinic_scheduler.mapper.AppointmentMapper;
 import com.clinic.medical_clinic_scheduler.model.Appointment;
 import com.clinic.medical_clinic_scheduler.model.AppointmentStatus;
@@ -10,8 +13,8 @@ import com.clinic.medical_clinic_scheduler.model.Doctor;
 import com.clinic.medical_clinic_scheduler.repository.AppointmentRepository;
 import com.clinic.medical_clinic_scheduler.repository.DoctorRepository;
 import com.clinic.medical_clinic_scheduler.repository.PatientRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AppointmentServiceImpl implements AppointmentService {
 
     private final AppointmentRepository appointmentRepository;
@@ -34,9 +38,10 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     @Transactional
     public List<AppointmentDTO> createSchedule(ScheduleRequestDTO request) {
+        log.info("Creating schedule for doctor ID: {} from {} to {}", request.getDoctorId(), request.getStartTime(), request.getEndTime());
 
         Doctor doctor = doctorRepository.findById(request.getDoctorId())
-                .orElseThrow(() -> new EntityNotFoundException("Doctor not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Doctor with ID " + request.getDoctorId() + " not found"));
 
         List<Appointment> newAppointments = new ArrayList<>();
         LocalDateTime currentSlotStart = request.getStartTime();
@@ -60,6 +65,7 @@ public class AppointmentServiceImpl implements AppointmentService {
         }
 
         List<Appointment> savedAppointments = appointmentRepository.saveAll(newAppointments);
+        log.info("Successfully created {} appointment slots", savedAppointments.size());
 
         return savedAppointments.stream()
                 .map(appointmentMapper::toDTO)
@@ -69,25 +75,27 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     @Transactional
     public AppointmentDTO bookAppointment(Long appointmentId, BookAppointmentDTO bookAppointmentDTO) {
+        log.info("Patient ID: {} is attempting to book appointment ID: {}", bookAppointmentDTO.getPatientId(), appointmentId);
 
         Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new EntityNotFoundException("Appointment with ID " + appointmentId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment with ID " + appointmentId + " not found"));
 
         if (appointment.getStartTime().isBefore(LocalDateTime.now())) {
-            throw new IllegalStateException("Cannot book an appointment in the past");
+            throw new ActionNotAllowedException("Cannot book an appointment in the past");
         }
 
         if (appointment.getStatus() != AppointmentStatus.AVAILABLE) {
-            throw new IllegalStateException("Appointment is already booked or cancelled");
+            throw new AppointmentConflictException("Appointment is already booked or cancelled");
         }
 
         com.clinic.medical_clinic_scheduler.model.Patient patient = patientRepository.findById(bookAppointmentDTO.getPatientId())
-                .orElseThrow(() -> new EntityNotFoundException("Patient with ID " + bookAppointmentDTO.getPatientId() + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Patient with ID " + bookAppointmentDTO.getPatientId() + " not found"));
 
         appointment.setPatient(patient);
         appointment.setStatus(AppointmentStatus.BOOKED);
 
         Appointment updatedAppointment = appointmentRepository.save(appointment);
+        log.info("Successfully booked appointment ID: {}", appointmentId);
 
         return appointmentMapper.toDTO(updatedAppointment);
     }
@@ -95,6 +103,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     @Transactional(readOnly = true)
     public List<AppointmentDTO> getAvailableSlots(Long doctorId, String date) {
+        log.debug("Fetching available slots for doctor ID: {} on date: {}", doctorId, date);
         LocalDate searchDate = LocalDate.parse(date);
         LocalDateTime startOfDay = searchDate.atStartOfDay();
         LocalDateTime endOfDay = searchDate.atTime(LocalTime.MAX);
@@ -111,6 +120,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     @Transactional(readOnly = true)
     public List<AppointmentDTO> getPatientAppointments(Long patientId) {
+        log.debug("Fetching appointments for patient ID: {}", patientId);
         return appointmentRepository.findAllByPatientId(patientId)
                 .stream()
                 .map(appointmentMapper::toDTO)
@@ -120,21 +130,25 @@ public class AppointmentServiceImpl implements AppointmentService {
     @Override
     @Transactional
     public AppointmentDTO cancelAppointment(Long appointmentId) {
+        log.info("Attempting to cancel appointment ID: {}", appointmentId);
 
         Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new EntityNotFoundException("Appointment with ID " + appointmentId + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Appointment with ID " + appointmentId + " not found"));
 
         if (appointment.getStatus() != AppointmentStatus.BOOKED) {
-            throw new IllegalStateException("Only booked appointments can be cancelled");
+            throw new ActionNotAllowedException("Only booked appointments can be cancelled");
         }
 
         if (appointment.getStartTime().isBefore(LocalDateTime.now())) {
-            throw new IllegalStateException("Cannot cancel an appointment that has already taken place");
+            throw new ActionNotAllowedException("Cannot cancel an appointment that has already taken place");
         }
 
         appointment.setPatient(null);
         appointment.setStatus(AppointmentStatus.AVAILABLE);
 
-        return appointmentMapper.toDTO(appointmentRepository.save(appointment));
+        Appointment saved = appointmentRepository.save(appointment);
+        log.info("Successfully cancelled appointment ID: {}", appointmentId);
+
+        return appointmentMapper.toDTO(saved);
     }
 }
