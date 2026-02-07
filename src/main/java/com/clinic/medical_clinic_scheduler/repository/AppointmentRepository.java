@@ -1,6 +1,7 @@
 package com.clinic.medical_clinic_scheduler.repository;
 
 import com.clinic.medical_clinic_scheduler.model.Appointment;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -12,6 +13,7 @@ import java.util.List;
 @Repository
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
 
+    @EntityGraph(attributePaths = {"doctor"})
     List<Appointment> findAllByDoctorIdAndStartTimeBetween(Long doctorId, LocalDateTime start, LocalDateTime end);
 
     List<Appointment> findAllByPatientId(Long patientId);
