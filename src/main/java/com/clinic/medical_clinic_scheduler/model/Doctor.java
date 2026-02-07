@@ -44,5 +44,6 @@ public class Doctor {
     private Role role;
 
     @Column(nullable = false)
+    @Builder.Default
     private boolean deleted = false;
 }

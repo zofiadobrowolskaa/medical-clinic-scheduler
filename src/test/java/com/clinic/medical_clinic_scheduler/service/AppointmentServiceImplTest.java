@@ -2,6 +2,7 @@ package com.clinic.medical_clinic_scheduler.service;
 
 import com.clinic.medical_clinic_scheduler.dto.AppointmentDTO;
 import com.clinic.medical_clinic_scheduler.dto.BookAppointmentDTO;
+import com.clinic.medical_clinic_scheduler.exception.ActionNotAllowedException;
 import com.clinic.medical_clinic_scheduler.mapper.AppointmentMapper;
 import com.clinic.medical_clinic_scheduler.model.Appointment;
 import com.clinic.medical_clinic_scheduler.model.AppointmentStatus;
@@ -36,6 +37,8 @@ class AppointmentServiceImplTest {
     private DoctorRepository doctorRepository;
     @Mock
     private AppointmentMapper appointmentMapper;
+    @Mock
+    private NotificationService notificationService;
 
     @InjectMocks
     private AppointmentServiceImpl appointmentService;
@@ -52,7 +55,7 @@ class AppointmentServiceImplTest {
                 .id(appointmentId)
                 .status(AppointmentStatus.AVAILABLE)
                 .startTime(LocalDateTime.now().plusDays(1))
-                .doctor(Doctor.builder().firstName("House").lastName("MD").build()) // required for mapper logic
+                .doctor(Doctor.builder().firstName("House").lastName("MD").build())
                 .build();
 
         // mock repository behavior
@@ -68,6 +71,8 @@ class AppointmentServiceImplTest {
 
         // then
         verify(appointmentRepository).save(appointment);
+        verify(notificationService).sendAppointmentConfirmation(any(), any(), any());
+
         assertThat(result.getStatus()).isEqualTo(AppointmentStatus.BOOKED);
         assertThat(appointment.getStatus()).isEqualTo(AppointmentStatus.BOOKED);
         assertThat(appointment.getPatient()).isEqualTo(patient);
@@ -86,7 +91,7 @@ class AppointmentServiceImplTest {
         when(appointmentRepository.findById(appointmentId)).thenReturn(Optional.of(appointment));
 
         // when & then
-        assertThrows(IllegalStateException.class, () ->
+        assertThrows(ActionNotAllowedException.class, () ->
                 appointmentService.bookAppointment(appointmentId, new BookAppointmentDTO(1L))
         );
     }
