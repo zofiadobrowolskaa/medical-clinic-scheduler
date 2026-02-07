@@ -1,5 +1,6 @@
 package com.clinic.medical_clinic_scheduler.config;
 
+import com.clinic.medical_clinic_scheduler.model.Role;
 import com.clinic.medical_clinic_scheduler.repository.DoctorRepository;
 import com.clinic.medical_clinic_scheduler.repository.PatientRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +34,7 @@ public class ApplicationConfig {
                 return User.builder()
                         .username(patient.get().getEmail())
                         .password(patient.get().getPassword())
-                        .roles(patient.get().getRole())
+                        .roles(patient.get().getRole().name())
                         .build();
             }
 
@@ -44,7 +45,7 @@ public class ApplicationConfig {
                 return User.builder()
                         .username(doctor.get().getEmail())
                         .password(doctor.get().getPassword())
-                        .roles(doctor.get().getRole())
+                        .roles(doctor.get().getRole().name())
                         .build();
             }
 
@@ -52,7 +53,7 @@ public class ApplicationConfig {
                 return User.builder()
                         .username("admin@clinic.com")
                         .password(passwordEncoder().encode("admin123"))
-                        .roles("ADMIN")
+                        .roles(Role.ADMIN.name())
                         .build();
             }
 

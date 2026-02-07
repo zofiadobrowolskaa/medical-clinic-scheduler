@@ -5,6 +5,7 @@ import com.clinic.medical_clinic_scheduler.dto.DoctorDTO;
 import com.clinic.medical_clinic_scheduler.exception.DoctorAlreadyExistsException;
 import com.clinic.medical_clinic_scheduler.mapper.DoctorMapper;
 import com.clinic.medical_clinic_scheduler.model.Doctor;
+import com.clinic.medical_clinic_scheduler.model.Role;
 import com.clinic.medical_clinic_scheduler.repository.AppointmentRepository;
 import com.clinic.medical_clinic_scheduler.repository.DoctorRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -36,7 +37,7 @@ public class DoctorServiceImpl implements DoctorService {
         Doctor doctor = doctorMapper.toEntity(doctorCreateDTO);
 
         doctor.setPassword(passwordEncoder.encode(doctorCreateDTO.getPassword()));
-        doctor.setRole("DOCTOR");
+        doctor.setRole(Role.DOCTOR);
 
         Doctor savedDoctor = doctorRepository.save(doctor);
 
