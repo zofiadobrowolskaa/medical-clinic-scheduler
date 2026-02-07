@@ -32,6 +32,7 @@ public class Patient {
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String role;
+    private Role role;
 }

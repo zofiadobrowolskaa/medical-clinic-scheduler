@@ -6,6 +6,7 @@ import com.clinic.medical_clinic_scheduler.exception.PatientAlreadyExistsExcepti
 import com.clinic.medical_clinic_scheduler.mapper.PatientMapper;
 import com.clinic.medical_clinic_scheduler.model.Appointment;
 import com.clinic.medical_clinic_scheduler.model.Patient;
+import com.clinic.medical_clinic_scheduler.model.Role;
 import com.clinic.medical_clinic_scheduler.repository.AppointmentRepository;
 import com.clinic.medical_clinic_scheduler.repository.PatientRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -37,7 +38,7 @@ public class PatientServiceImpl implements PatientService {
         Patient patient = patientMapper.toEntity(patientCreateDTO);
 
         patient.setPassword(passwordEncoder.encode(patientCreateDTO.getPassword()));
-        patient.setRole("PATIENT");
+        patient.setRole(Role.PATIENT);
 
         Patient savedPatient = patientRepository.save(patient);
 
