@@ -2,6 +2,8 @@ package com.clinic.medical_clinic_scheduler.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "patient")
@@ -10,7 +12,8 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
+@SQLDelete(sql = "UPDATE patient SET deleted = true WHERE id = ?")
+@Where(clause = "deleted = false")
 public class Patient {
 
     @Id
@@ -35,4 +38,8 @@ public class Patient {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean deleted = false;
 }

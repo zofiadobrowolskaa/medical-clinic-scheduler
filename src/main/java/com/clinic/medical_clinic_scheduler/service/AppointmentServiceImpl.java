@@ -34,6 +34,7 @@ public class AppointmentServiceImpl implements AppointmentService {
     private final DoctorRepository doctorRepository;
     private final PatientRepository patientRepository;
     private final AppointmentMapper appointmentMapper;
+    private final NotificationService notificationService;
 
     @Override
     @Transactional
@@ -96,6 +97,15 @@ public class AppointmentServiceImpl implements AppointmentService {
 
         Appointment updatedAppointment = appointmentRepository.save(appointment);
         log.info("Successfully booked appointment ID: {}", appointmentId);
+
+        String emailContent = "Your appointment with Dr. " + updatedAppointment.getDoctor().getLastName() +
+                " is confirmed for " + updatedAppointment.getStartTime();
+
+        notificationService.sendAppointmentConfirmation(
+                patient.getEmail(),
+                "Appointment Confirmation",
+                emailContent
+        );
 
         return appointmentMapper.toDTO(updatedAppointment);
     }
