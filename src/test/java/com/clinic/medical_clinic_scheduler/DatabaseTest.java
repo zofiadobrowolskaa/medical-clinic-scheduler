@@ -5,11 +5,14 @@ import com.clinic.medical_clinic_scheduler.repository.PatientRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-// @ActiveProfiles("test")
+@Transactional // rollback changes after each test
+@ActiveProfiles("test")
 class DatabaseTest {
 
     @Autowired
@@ -19,11 +22,12 @@ class DatabaseTest {
     void shouldSaveAndRetrievePatient() {
         // given
         Patient patient = Patient.builder()
-                .email("test@example.com")
+                .email("test-db@example.com")
                 .password("secret123")
                 .firstName("John")
                 .lastName("Doe")
                 .phoneNumber("123456789")
+                .role("PATIENT")
                 .build();
 
         // when
@@ -31,9 +35,9 @@ class DatabaseTest {
 
         // then
         assertThat(savedPatient.getId()).isNotNull();
-        assertThat(savedPatient.getEmail()).isEqualTo("test@example.com");
+        assertThat(savedPatient.getEmail()).isEqualTo("test-db@example.com");
 
-        boolean exists = patientRepository.existsByEmail("test@example.com");
+        boolean exists = patientRepository.existsByEmail("test-db@example.com");
         assertThat(exists).isTrue();
     }
 }
