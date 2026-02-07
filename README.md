@@ -79,6 +79,9 @@ The application leverages modern backend technologies with a strong emphasis on 
 - **Flyway** for database schema versioning
 - 5 migrations covering complete schema evolution
 
+### Monitoring and Health Checks
+- **Spring Boot Actuator** for real-time application health monitoring
+- **Docker Healthcheck** integration ensuring the container is only marked "healthy" when the Spring context is fully initialized
 ---
 
 ## Architecture
@@ -120,6 +123,7 @@ The project uses a **layered architecture** with clear separation of concerns:
 - Spring Data JPA (ORM)
 - Spring Security (authorization + JWT)
 - Spring Validation (request validation)
+- Spring Boot Actuator (monitoring)
 
 ### Database
 - **PostgreSQL 15** (production)
@@ -191,6 +195,7 @@ Execute the following command to build the image and start services:
 The application will start on port ```8080```.
    - API: `http://localhost:8080`
    - Swagger UI: `http://localhost:8080/swagger-ui/index.html`
+   - Health Check: `http://localhost:8080/actuator/health`
    - Database: Accessible locally at ```localhost:5433``` (User/Pass: ```postgres```/```postgres```)
 
 ---
@@ -427,6 +432,9 @@ Swagger UI allows you to:
 - Browse all endpoints
 - Test API directly from the browser
 - Authenticate using JWT (click "Authorize" and paste token)
+
+### Health Monitoring
+The application health status is available at `/actuator/health`. This endpoint is used by Docker to perform automated health checks.
 
 ### OpenAPI Specification
 
