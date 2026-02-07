@@ -10,12 +10,11 @@ import com.clinic.medical_clinic_scheduler.repository.AppointmentRepository;
 import com.clinic.medical_clinic_scheduler.repository.DoctorRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -46,11 +45,9 @@ public class DoctorServiceImpl implements DoctorService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DoctorDTO> getAllDoctors() {
-        return doctorRepository.findAll()
-                .stream()
-                .map(doctorMapper::toDTO)
-                .collect(Collectors.toList());
+    public Page<DoctorDTO> getAllDoctors(Pageable pageable) {
+        return doctorRepository.findAll(pageable)
+                .map(doctorMapper::toDTO);
     }
 
     @Override

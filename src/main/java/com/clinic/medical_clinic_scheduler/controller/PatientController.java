@@ -5,11 +5,12 @@ import com.clinic.medical_clinic_scheduler.dto.PatientDTO;
 import com.clinic.medical_clinic_scheduler.service.PatientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/patients")
@@ -25,8 +26,10 @@ public class PatientController {
     }
 
     @GetMapping
-    public ResponseEntity<List<PatientDTO>> getAllPatients() {
-        return ResponseEntity.ok(patientService.getAllPatients());
+    public ResponseEntity<Page<PatientDTO>> getAllPatients(
+            @PageableDefault(size = 10, sort = "lastName") Pageable pageable
+    ) {
+        return ResponseEntity.ok(patientService.getAllPatients(pageable));
     }
 
     @DeleteMapping("/{id}")
