@@ -95,4 +95,25 @@ class AppointmentServiceImplTest {
                 appointmentService.bookAppointment(appointmentId, new BookAppointmentDTO(1L))
         );
     }
+
+    @Test
+    void shouldThrowExceptionWhenCreatingScheduleOverlappingWithExistingAppointments() {
+        Long doctorId = 1L;
+        LocalDateTime start = LocalDateTime.now().plusDays(1).withHour(10);
+        LocalDateTime end = start.plusHours(2);
+
+        com.clinic.medical_clinic_scheduler.dto.ScheduleRequestDTO request =
+                new com.clinic.medical_clinic_scheduler.dto.ScheduleRequestDTO(doctorId, start, end, 30);
+
+        when(doctorRepository.findById(doctorId)).thenReturn(Optional.of(new Doctor()));
+
+        when(appointmentRepository.existsOverlappingAppointments(doctorId, start, end))
+                .thenReturn(true);
+
+        assertThrows(com.clinic.medical_clinic_scheduler.exception.AppointmentConflictException.class, () ->
+                appointmentService.createSchedule(request)
+        );
+
+        verify(appointmentRepository, org.mockito.Mockito.never()).saveAll(any());
+    }
 }
