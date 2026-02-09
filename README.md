@@ -82,6 +82,12 @@ The application leverages modern backend technologies with a strong emphasis on 
 ### Monitoring and Health Checks
 - **Spring Boot Actuator** for real-time application health monitoring
 - **Docker Healthcheck** integration ensuring the container is only marked "healthy" when the Spring context is fully initialized
+
+## API Documentation
+Interactive API documentation is available via Swagger UI.
+
+![Swagger UI Screenshot](swagger.png)
+
 ---
 
 ## Architecture
@@ -584,7 +590,7 @@ curl -X POST http://localhost:8080/api/appointments/schedule \
     "doctorId": 1,
     "startTime": "2026-02-15T10:00:00",
     "endTime": "2026-02-15T12:00:00",
-    "slotDurationMinutes": 30
+    "slotDuration": 30
   }'
 
 # Creates 4 slots: 10:00, 10:30, 11:00, 11:30
@@ -614,14 +620,11 @@ curl -X GET http://localhost:8080/api/appointments/patient/5 \
 
 ## Roadmap (Future Features)
 
-- [ ] Integration with real email system (SendGrid / SMTP)
+- [ ] Integration with real email system
 - [ ] WebSocket notifications for real-time updates
 - [ ] Reporting and statistics for administrators
-- [ ] PDF export (appointment history)
 - [ ] Doctor rating and review system
 - [ ] SMS reminders before appointments
-- [ ] Admin panel (frontend)
-- [ ] Multi-language support (i18n)
 - [ ] Elasticsearch for advanced search
 
 ---
