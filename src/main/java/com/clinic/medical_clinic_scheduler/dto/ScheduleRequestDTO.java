@@ -1,6 +1,8 @@
 package com.clinic.medical_clinic_scheduler.dto;
 
 import jakarta.validation.constraints.FutureOrPresent;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -25,5 +27,7 @@ public class ScheduleRequestDTO {
     private LocalDateTime endTime;
 
     @NotNull(message = "Slot duration is required")
-    private Integer slotDurationMinutes;
+    @Min(value = 15, message = "Slot duration must be at least 15 minutes")
+    @Max(value = 120, message = "Slot duration cannot exceed 120 minutes")
+    private Integer slotDuration;
 }

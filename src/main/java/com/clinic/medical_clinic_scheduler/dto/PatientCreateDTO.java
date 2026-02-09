@@ -29,6 +29,6 @@ public class PatientCreateDTO {
     private String lastName;
 
     @NotBlank(message = "Phone number is required")
-    @Pattern(regexp = "^\\d{9}$", message = "Phone number must be exactly 9 digits") // Np. format polski
+    @Pattern(regexp = "^\\d{9}$", message = "Phone number must be exactly 9 digits")
     private String phoneNumber;
 }
