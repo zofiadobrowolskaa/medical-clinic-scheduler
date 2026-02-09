@@ -5,7 +5,6 @@ import com.clinic.medical_clinic_scheduler.dto.ScheduleRequestDTO;
 import com.clinic.medical_clinic_scheduler.service.AppointmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,9 +18,9 @@ public class AppointmentController {
     private final AppointmentService appointmentService;
 
     @PostMapping("/schedule")
-    public ResponseEntity<List<AppointmentDTO>> createSchedule(@Valid @RequestBody ScheduleRequestDTO scheduleRequestDTO) {
-        List<AppointmentDTO> createdAppointments = appointmentService.createSchedule(scheduleRequestDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdAppointments);
+    public ResponseEntity<List<AppointmentDTO>> createSchedule(
+            @jakarta.validation.Valid @RequestBody ScheduleRequestDTO scheduleRequestDTO) {
+        return ResponseEntity.ok(appointmentService.createSchedule(scheduleRequestDTO));
     }
 
     @PatchMapping("/{id}/book")

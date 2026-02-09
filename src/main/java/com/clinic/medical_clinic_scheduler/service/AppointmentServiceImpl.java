@@ -57,10 +57,10 @@ public class AppointmentServiceImpl implements AppointmentService {
         List<Appointment> newAppointments = new ArrayList<>();
         LocalDateTime currentSlotStart = request.getStartTime();
 
-        while (currentSlotStart.plusMinutes(request.getSlotDurationMinutes()).isBefore(request.getEndTime()) ||
-                currentSlotStart.plusMinutes(request.getSlotDurationMinutes()).isEqual(request.getEndTime())) {
+        while (currentSlotStart.plusMinutes(request.getSlotDuration()).isBefore(request.getEndTime()) ||
+                currentSlotStart.plusMinutes(request.getSlotDuration()).isEqual(request.getEndTime())) {
 
-            LocalDateTime currentSlotEnd = currentSlotStart.plusMinutes(request.getSlotDurationMinutes());
+            LocalDateTime currentSlotEnd = currentSlotStart.plusMinutes(request.getSlotDuration());
 
             Appointment appointment = Appointment.builder()
                     .startTime(currentSlotStart)

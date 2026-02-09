@@ -3,6 +3,7 @@ package com.clinic.medical_clinic_scheduler.controller;
 import com.clinic.medical_clinic_scheduler.config.JwtService;
 import com.clinic.medical_clinic_scheduler.dto.LoginRequestDTO;
 import com.clinic.medical_clinic_scheduler.dto.LoginResponseDTO;
+import jakarta.validation.Valid; // <-- Ważny import
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class AuthController {
     private final UserDetailsService userDetailsService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponseDTO> authenticate(@RequestBody LoginRequestDTO request) {
+    public ResponseEntity<LoginResponseDTO> authenticate(@Valid @RequestBody LoginRequestDTO request) { // <-- Dodano @Valid
         log.info("Authentication attempt for user: {}", request.getEmail());
 
         authenticationManager.authenticate(
